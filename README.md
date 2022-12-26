@@ -8,3 +8,4 @@ Setting up the environment:
 4) Use the command ./vendor/bin/sail artisan db:seed to create the test user needed for our application
 5) Create an .env file based on the .env.example and fill the PRODUCTS_API_KEY with a valid key for the external API used ( https://rapidapi.com/apidojo/api/walmart )
 
+- The diagrams are in the diagram folder, the postman and openapi files on the root folder
