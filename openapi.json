@@ -1,0 +1,506 @@
+{
+    "openapi": "3.1.0",
+    "info": {
+        "title": "A simple cart API validating products with a Walmart API",
+        "version": "0.0.1"
+    },
+    "paths": {
+        "api/cart/{user}": {
+            "get": {
+                "summary": "Gets active cart",
+                "description": "Retrieves the user's current active cart",
+                "parameters": [
+                    {
+                        "name": "user",
+                        "in": "path",
+                        "description": "User that's trying to get the cart",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Current cart was able to get retrieved",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "created_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was created"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was last updated"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Open",
+                                                "Closed"
+                                            ],
+                                            "description": "Current status of the cart"
+                                        },
+                                        "closed_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was closed if the status is Closed"
+                                        },
+                                        "total": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "Total price of all the items contained in the cart"
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "description": "items added to the cart",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "product_id": {
+                                                        "type": "string",
+                                                        "description": "Identification number of the product on the external API"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "Name of the product"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "description": "Quantity of the product in the cart"
+                                                    },
+                                                    "individual_price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "Individual price of the product"
+                                                    },
+                                                    "total": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "Total price for the quantity added"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "description": "Date when the item was added first in the cart"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "description": "Date when the item was last updated in the cart"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "User was not found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        },
+                                        "exception": {
+                                            "type": "string",
+                                            "description": "Type of the Exception raised"
+                                        },
+                                        "file": {
+                                            "type": "string",
+                                            "description": "File that raised the exception"
+                                        },
+                                        "line": {
+                                            "type": "integer",
+                                            "description": "Line of the file that raised the exception"
+                                        },
+                                        "trace": {
+                                            "type": "array",
+                                            "description": "trace of the error",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "file": {
+                                                        "type": "string",
+                                                        "description": "File traced at this point"
+                                                    },
+                                                    "line": {
+                                                        "type": "integer",
+                                                        "description": "Line of the file traced at this point"
+                                                    },
+                                                    "function": {
+                                                        "type": "string",
+                                                        "description": "Function traced at this point"
+                                                    },
+                                                    "class": {
+                                                        "type": "string",
+                                                        "description": "Class traced at this point"
+                                                    },
+                                                    "type": {
+                                                        "type": "string",
+                                                        "description": "Type traced at this point"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "api/cart/add": {
+            "post": {
+                "summary": "Add an item to the cart",
+                "description": "Adds an item to the user's current active cart",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "body",
+                        "description": "User that's trying to add the item",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }                
+                    },
+                    {
+                        "name": "product_id",
+                        "in": "body",
+                        "description": "Id used in the external API top identify the product that's being added",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }   
+                    },
+                    {
+                        "name": "quantity",
+                        "in": "body",
+                        "description": "How many of the item are being added",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 1
+                        }   
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item was added correctly",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "created_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was created"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was last updated"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Open",
+                                                "Closed"
+                                            ],
+                                            "description": "Current status of the cart"
+                                        },
+                                        "closed_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was closed if the status is Closed"
+                                        },
+                                        "total": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "Total price of all the items contained in the cart"
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "description": "items added to the cart",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "product_id": {
+                                                        "type": "string",
+                                                        "description": "Identification number of the product on the external API"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "Name of the product"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "description": "Quantity of the product in the cart"
+                                                    },
+                                                    "individual_price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "Individual price of the product"
+                                                    },
+                                                    "total": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "Total price for the quantity added"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "description": "Date when the item was added first in the cart"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "description": "Date when the item was last updated in the cart"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Item was not found on the external API",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error validating the parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "description": "Parameters that failed to validate",
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "Validation that failed"
+                                                    }
+                                                },
+                                                "product_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "Validation that failed"
+                                                    }
+                                                },
+                                                "quantity": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "Validation that failed"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error not expected",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "api/cart/checkout": {
+            "post": {
+                "summary": "Checkout the cart",
+                "description": "Checkout the cart, closing the cart and enabling the creation of a new cart",
+                "parameters": [
+                    {
+                        "name": "user_id",
+                        "in": "body",
+                        "description": "User that's trying to add the item",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }                
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cart was checked out correctly",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "created_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was created"
+                                        },
+                                        "updated_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was last updated"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "enum": [
+                                                "Open",
+                                                "Closed"
+                                            ],
+                                            "description": "Current status of the cart"
+                                        },
+                                        "closed_at": {
+                                            "type": "string",
+                                            "description": "Date when the cart was closed if the status is Closed"
+                                        },
+                                        "total": {
+                                            "type": "number",
+                                            "format": "float",
+                                            "description": "Total price of all the items contained in the cart"
+                                        },
+                                        "items": {
+                                            "type": "array",
+                                            "description": "items added to the cart",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "product_id": {
+                                                        "type": "string",
+                                                        "description": "Identification number of the product on the external API"
+                                                    },
+                                                    "name": {
+                                                        "type": "string",
+                                                        "description": "Name of the product"
+                                                    },
+                                                    "quantity": {
+                                                        "type": "integer",
+                                                        "description": "Quantity of the product in the cart"
+                                                    },
+                                                    "individual_price": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "Individual price of the product"
+                                                    },
+                                                    "total": {
+                                                        "type": "number",
+                                                        "format": "float",
+                                                        "description": "Total price for the quantity added"
+                                                    },
+                                                    "created_at": {
+                                                        "type": "string",
+                                                        "description": "Date when the item was added first in the cart"
+                                                    },
+                                                    "updated_at": {
+                                                        "type": "string",
+                                                        "description": "Date when the item was last updated in the cart"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Cart is empty",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error validating the parameters",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        },
+                                        "errors": {
+                                            "type": "object",
+                                            "description": "Parameters that failed to validate",
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "description": "Validation that failed"
+                                                    }
+                                                },
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error not expected",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string",
+                                            "description": "Message with the error"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

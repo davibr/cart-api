@@ -1,0 +1,94 @@
+{
+	"variables": [],
+	"info": {
+		"name": "Cart API",
+		"_postman_id": "4ac875fb-d05e-ae1f-6fa6-827f59b61ee3",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Cart",
+			"request": {
+				"url": "http://localhost/api/cart/1",
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {},
+				"description": "Gets the current cart of the user"
+			},
+			"response": []
+		},
+		{
+			"name": "Add Item",
+			"request": {
+				"url": "http://localhost/api/cart/add",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "user_id",
+							"value": "1",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "product_id",
+							"value": "770319092",
+							"description": "",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "1",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"description": "Adds an item to the cart"
+			},
+			"response": []
+		},
+		{
+			"name": "Checkout",
+			"request": {
+				"url": "http://localhost/api/cart/checkout",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "user_id",
+							"value": "1",
+							"description": "",
+							"type": "text"
+						}
+					]
+				},
+				"description": "Checks out the cart"
+			},
+			"response": []
+		}
+	]
+}

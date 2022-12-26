@@ -31,4 +31,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'products' => [
+        'url' => env('PRODUCTS_API_URL'),
+        'host' => env('PRODUCTS_API_HOST'),
+        'key' => env('PRODUCTS_API_KEY'),
+    ],
+
 ];
