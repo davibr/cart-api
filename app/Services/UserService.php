@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use Illuminate\Http\Request;
+use App\Models\Cart;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class UserService
 {
@@ -18,4 +19,5 @@ class UserService
     {
         return User::find($request->user_id);
     }
+
 }

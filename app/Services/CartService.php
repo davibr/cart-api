@@ -2,20 +2,31 @@
 
 namespace App\Services;
 
-use Exception;
-use App\Models\User;
+use App\Interfaces\ExternalAPIInterface;
 use App\Models\Cart;
 use App\Models\Item;
+use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use function app;
+use function now;
 
 class CartService
 {
+
+    /**
+     * @var Cart
+     */
     private $cart;
+
+    /**
+     * @var ItemService
+     */
     private $itemService;
 
-    public function __construct()
+    public function __construct(ExternalAPIInterface $externalAPIService)
     {
-        $this->itemService = app(ItemService::class);
+        $this->itemService = app(ItemService::class, compact('externalAPIService'));
     }
 
     /**
@@ -28,7 +39,7 @@ class CartService
     {
         $this->cart = $user->carts()->active()->first();
 
-        if (!$this->cart) 
+        if (!$this->cart)
         {
             $this->cart = $user->carts()->create();
         }
@@ -46,7 +57,7 @@ class CartService
     private function addOrIncrementToItems($productId, $quantity)
     {
         $item = $this->cart->items()->withProduct($productId)->first();
-        
+
         if ($item)
         {
             $item->quantity += $quantity;
@@ -55,10 +66,9 @@ class CartService
         }
 
         return $this->cart->items()->create([
-            'product_id' => $productId,
-            'quantity' => $quantity
+                    'product_id' => $productId,
+                    'quantity' => $quantity
         ]);
-
     }
 
     /**
@@ -74,13 +84,22 @@ class CartService
 
         $item = $this->addOrIncrementToItems($request->product_id, $request->quantity);
 
-        try 
+        try
         {
             $this->itemService->updatesItemFromAPI($item);
         }
-        catch(Exception $e)
+        catch (Exception $e)
         {
-            $item->delete();
+            if ($item->quantity > $request->quantity)
+            {
+                $item->quantity -= $request->quantity;
+                $item->save();
+            }
+            else
+            {
+                $item->delete();
+            }
+
             throw $e;
         }
 
@@ -93,9 +112,9 @@ class CartService
      * Checks if the cart is ready for checkout
      * @throws Exception if cart doesn't have items
      */
-    private function validatesCartForCheckout() 
+    private function validatesCartForCheckout()
     {
-        if ($this->cart->items->count() == 0) 
+        if ($this->cart->items->count() == 0)
         {
             throw new Exception("You can't checkout without items.", 400);
         }
@@ -118,6 +137,5 @@ class CartService
 
         return $this->cart;
     }
-
 
 }

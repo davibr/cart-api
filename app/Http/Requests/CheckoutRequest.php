@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class CheckoutRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -27,4 +28,5 @@ class CheckoutRequest extends FormRequest
             'user_id' => 'numeric|required|exists:users,id',
         ];
     }
+
 }

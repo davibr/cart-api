@@ -2,40 +2,37 @@
 
 namespace App\Services;
 
-use Exception;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Http\Client\Response;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Arr;
+use App\Interfaces\ExternalAPIInterface;
 use App\Models\Item;
+use Exception;
+use Illuminate\Http\Client\Response;
+use Illuminate\Support\Arr;
 
 class ItemService
 {
-    /**
-     * Return the headers needed for the http request to the API
-     * @return array
-     */
-    private function getHeaders() 
-    {
-        return [
-            'X-RapidAPI-Key' => config('services.products.key'),
-            'X-RapidAPI-Host' => config('services.products.host'),
-        ];
-    }
 
+    /**
+     * @var ExternalAPIService
+     */
+    private $externalAPIService;
+
+    public function __construct(ExternalAPIInterface $externalAPIService)
+    {
+        $this->externalAPIService = $externalAPIService;
+    }
 
     /**
      * Verifies if there's an error with the collected response.
      *
-     * @param  Response  $response
+     * @param  \ArrayAccess  $response
      * @throws Exception if an error was found in the response
      */
-    private function verifyAPIErrors(Response $response)
+    private function verifyAPIErrors($response)
     {
         $errors = Arr::get($response, 'errors');
         if ($errors)
         {
-            foreach ($errors as $error) 
+            foreach ($errors as $error)
             {
                 if (Arr::get($error, 'message') == "404")
                 {
@@ -45,29 +42,15 @@ class ItemService
             throw new Exception('There was an error getting the details of the product');
         }
 
-        if (!Arr::get($response, 'data.product.priceInfo.currentPrice.price')) 
+        if (!Arr::get($response, 'data.product.priceInfo.currentPrice.price'))
         {
             throw new Exception('The API did not return the product price as expected');
         }
 
-        if (!Arr::get($response, 'data.product.name')) 
+        if (!Arr::get($response, 'data.product.name'))
         {
             throw new Exception('The API did not return the product name as expected');
         }
-    }
-
-
-    /** 
-     * Gets details from the external API about the product
-     * 
-     * @param string $productId
-     * @return Response
-     */
-    private function getDataFromAPI($productId) {
-        return Http::withHeaders($this->getHeaders())
-            ->get(config('services.products.url'), [
-                'usItemId' => $productId
-            ]);
     }
 
     /**
@@ -78,12 +61,13 @@ class ItemService
      */
     public function updatesItemFromAPI(Item $item)
     {
-        $response = $this->getDataFromAPI($item->product_id);
+        $response = $this->externalAPIService->getDataFromAPI($item->product_id);
 
         $this->verifyAPIErrors($response);
-        
+
         $item->individual_price = Arr::get($response, 'data.product.priceInfo.currentPrice.price');
         $item->name = Arr::get($response, 'data.product.name');
         $item->save();
     }
+
 }

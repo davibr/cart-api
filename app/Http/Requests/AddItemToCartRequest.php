@@ -6,6 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AddItemToCartRequest extends FormRequest
 {
+
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -29,4 +30,5 @@ class AddItemToCartRequest extends FormRequest
             'quantity' => 'numeric|integer|required|min:1'
         ];
     }
+
 }

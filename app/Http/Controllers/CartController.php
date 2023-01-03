@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Exception;
-use Illuminate\Http\Request;
-use App\Http\Requests\CheckoutRequest;
 use App\Http\Requests\AddItemToCartRequest;
+use App\Http\Requests\CheckoutRequest;
 use App\Http\Resources\CartResource;
+use App\Interfaces\ExternalAPIInterface;
+use App\Models\User;
 use App\Services\CartService;
 use App\Services\UserService;
-use App\Models\Cart;
-use App\Models\User;
+use Exception;
+use function app;
+use function response;
 
 class CartController extends Controller
 {
+
     private $cartService;
 
-    public function __construct()
+    public function __construct(ExternalAPIInterface $externalAPIService)
     {
-        $this->cartService = app(CartService::class);
+        $this->cartService = app(CartService::class, compact('externalAPIService'));
     }
 
     /**
@@ -36,11 +38,11 @@ class CartController extends Controller
      * Add an Item to the current cart.
      *
      * @param  AddItemToCartRequest  $request
-     * @return Response
+     * @return CartResource
      */
     public function addItem(AddItemToCartRequest $request)
     {
-        try 
+        try
         {
             $user = UserService::getUserFromRequest($request);
             return new CartResource($this->cartService->addItemToCart($request, $user));
@@ -48,8 +50,8 @@ class CartController extends Controller
         catch (Exception $e)
         {
             return response()->json([
-                'error' => $e->getMessage(),
-            ], $e->getCode());
+                        'error' => $e->getMessage(),
+                            ], $e->getCode());
         }
     }
 
@@ -57,11 +59,11 @@ class CartController extends Controller
      * Add an Item to the current cart.
      *
      * @param  CheckoutRequest  $request
-     * @return Response
+     * @return CartResource
      */
     public function checkout(CheckoutRequest $request)
-    {        
-        try 
+    {
+        try
         {
             $user = UserService::getUserFromRequest($request);
             return new CartResource($this->cartService->checkout($user));
@@ -69,8 +71,9 @@ class CartController extends Controller
         catch (Exception $e)
         {
             return response()->json([
-                'error' => $e->getMessage(),
-            ], $e->getCode());
+                        'error' => $e->getMessage(),
+                            ], $e->getCode());
         }
     }
+
 }

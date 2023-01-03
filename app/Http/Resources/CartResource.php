@@ -2,20 +2,20 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
 
 class CartResource extends JsonResource
 {
+
     /**
      * The "data" wrapper that should be applied.
      *
      * @var string|null
      */
     public static $wrap = 'cart';
-
 
     /**
      * Transform the resource into an array.
@@ -34,4 +34,5 @@ class CartResource extends JsonResource
             'items' => ItemResource::collection($this->items),
         ];
     }
+
 }

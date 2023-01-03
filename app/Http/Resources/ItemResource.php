@@ -2,13 +2,14 @@
 
 namespace App\Http\Resources;
 
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use JsonSerializable;
 
 class ItemResource extends JsonResource
 {
+
     /**
      * Transform the resource into an array.
      *
@@ -27,4 +28,5 @@ class ItemResource extends JsonResource
             'updated_at' => $this->updated_at
         ];
     }
+
 }
